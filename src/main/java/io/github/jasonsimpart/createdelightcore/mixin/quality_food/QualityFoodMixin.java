@@ -97,7 +97,7 @@ public abstract class QualityFoodMixin {
         }
     }
 
-    @Inject(method = "applyQuality(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;Lde/cadentem/quality_food/core/Quality;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "applyHarvestQuality(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;Lde/cadentem/quality_food/core/Quality;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/block/state/BlockState;)V", at = @At("HEAD"), cancellable = true, remap = false)
     private static void applyQualityMixin(ItemStack stack, BlockState state, Quality blockQuality, Player player, BlockState farmland, CallbackInfo ci) {
         TagKey<Block> crop = TagKey.create(Registries.BLOCK, new ResourceLocation("createdelight", "quality_crops"));
         if (isRelevantCrop(state) || state.is(crop)) {
@@ -119,11 +119,7 @@ public abstract class QualityFoodMixin {
                 if (chanceQuality.level() == 0) {
                     chance = QualityConfig.getChance(quality);
                 } else {
-                    chance = Mth.clamp(
-                            QualityConfig.getChance(quality) * QualityConfig.calculateChance(quality, QualityConfig.getWeight(chanceQuality)) * QualityConfig.getWeight(Quality.DIAMOND),
-                            0.0,
-                            1.0
-                    );
+                    chance = QualityConfig.calculateChance(quality, QualityConfig.getWeight(chanceQuality));
                 }
                 chance = Modification.harvestOrSeedMultiplier(quality, stack).apply(chance);
                 chance = Modification.luck(player).apply(chance);
